@@ -4,6 +4,22 @@ Student Id: 151057054
 Name:       Dong Le
 Email:      dong.le@tuni.fi
 
+This is an advanced GUI program
+The memroy flip game is about remember cards, game's rule is simple, user clicks on a card to see
+what symbol it uncover and try to find the matching symbol underneath the other cards. 
+Uncover two cards at once to eliminate them from the game. Eliminate all cards to win the game.
+
+The program starts by import libraries: tkinter, time, and random. There are 3 modes for the game:
+easy, medium, and hard. Each modes have different number of cards, easy mode has 3x4=12 cards/game,
+medium mode has 4x6=24 cards/game, and hard mode has 5x8=40 cards/game. 
+
+There are 2 themes for the game: pokemon and league of legends (note: all images from pokemon are
+from The Pokémon Company and Nitendo, images from league of legends are from Riot Games)
+All modes and themes are stored in dictionaries, MODE_DICT has values are name of mode and keys are
+row * collumn, THEME_DICT has values are theme name and keys are the location of images for that
+theme. There is also a list of background images: tuni logo, pokeball logo, league of legends logo.
+
+
 
 """
 
@@ -13,13 +29,20 @@ import time
 import random
 
 SAMPLE_PIC = 20
-MODE = ["Easy", "Medium", "Hard"]
-THEME = ["Pokemon", "League of Legends"]
+# MODE = ["Easy", "Medium", "Hard"]
+# THEME = ["Pokemon", "League of Legends"]
+
+MODE_DICT = {"Easy": "3x4",
+            "Medium": "4x6",
+            "Hard": "5x8"}
+THEME_DICT = {"Pokemon": "images/pokemon/",
+              "League of Legends": "images/lol/"}
+IMAGE_BG = ["images/tuni.png","images/pokemon.png","images/lol.png"]
 
 class Gallery:
     def __init__(self):
         self.__gallery_window = Tk()
-        self.__gallery_window.geometry("+200+200")
+        self.__gallery_window.geometry("+100+20")
         self.__gallery_window.resizable(0, 0)
         self.__gallery_window.title("Gallery View")
 
@@ -36,20 +59,20 @@ class Gallery:
         file_menu.add_command(label="Exit", command= self.__gallery_window.destroy)
 
         self.__lol_intro = Label(self.__gallery_window, 
-                        text = 'LEAGUE OF LEGENDS', font=('Arial',10))
-        image_lol = PhotoImage(file="images/lol/lol.png")
+                        text = list(THEME_DICT.keys())[1], font=('Arial',10))
+        image_lol = PhotoImage(file=IMAGE_BG[2])
         
         self.__lol_view = Button(self.__gallery_window, image=image_lol,
-                        command=lambda route='images/lol/':
+                        command=lambda route=THEME_DICT["League of Legends"]:
                         self.clicked(route))
         self.__lol_view.image = image_lol
         
         self.__pkm_intro = Label(self.__gallery_window, 
-                        text = 'POKEMON', font=('Arial',10))
-        image_pkm = PhotoImage(file="images/pokemon/pokemon.png")
+                        text = list(THEME_DICT.keys())[0], font=('Arial',10))
+        image_pkm = PhotoImage(file=IMAGE_BG[1])
 
         self.__pkm_view = Button(self.__gallery_window, image=image_pkm,
-                        command=lambda route='images/pokemon/':
+                        command=lambda route=THEME_DICT["Pokemon"]:
                         self.clicked(route))
         self.__pkm_view.image = image_pkm
         
@@ -118,9 +141,9 @@ class Gallery:
             
 
 class GamePlay:
-    def __init__(self, COL_SIZE, ROW_SIZE, theme):
+    def __init__(self, ROW_SIZE, COL_SIZE, theme):
         self.__game_window = Tk()
-        self.__game_window.geometry("+200+200")
+        self.__game_window.geometry("+100+20")
         self.__game_window.resizable(0, 0)
         self.__game_window.title("Game Play")
 
@@ -166,7 +189,7 @@ class GamePlay:
 
     def prepare(self):
         cards = self.generate_cards()
-        self.__background_image = PhotoImage(file="images/tuni.png")
+        self.__background_image = PhotoImage(file=IMAGE_BG[0])
         buttons = []
         for row in range(self.__row):
             for col in range(self.__col):
@@ -244,7 +267,7 @@ class GamePlay:
 
     def restart(self):
         self.__game_window.destroy()
-        GamePlay(self.__col, self.__row, self.__theme)
+        GamePlay(self.__row, self.__col, self.__theme)
 
     
     def hint(self):
@@ -256,7 +279,7 @@ class GamePlay:
 class Main_Screen:
     def __init__(self):
         self.__main_window = Tk()
-        self.__main_window.geometry("+200+100")
+        self.__main_window.geometry("+100+20")
         self.__main_window.resizable(0, 0)
         self.__main_window.title("Memory Game")
 
@@ -305,7 +328,7 @@ class Main_Screen:
 class Mode_Theme:
     def __init__(self):
         self.__mt_window = Tk()
-        self.__mt_window.geometry("+200+100")
+        self.__mt_window.geometry("+100+20")
         self.__mt_window.resizable(0, 0)
         self.__mt_window.title("New Game")
 
@@ -315,15 +338,15 @@ class Mode_Theme:
 
         
         self.__clicked1 = StringVar()
-        self.__clicked1.set(MODE[0])
+        self.__clicked1.set(next(iter(MODE_DICT)))
         intro1 = Label(self.__mt_window, text="Mode")
-        choice1 = OptionMenu(self.__mt_window, self.__clicked1, *MODE)
+        choice1 = OptionMenu(self.__mt_window, self.__clicked1, *MODE_DICT)
 
         
         self.__clicked2 = StringVar()
-        self.__clicked2.set(THEME[0])
+        self.__clicked2.set(next(iter(THEME_DICT)))
         intro2 = Label(self.__mt_window, text="Theme")
-        choice2 = OptionMenu(self.__mt_window, self.__clicked2, *THEME)
+        choice2 = OptionMenu(self.__mt_window, self.__clicked2, *THEME_DICT)
 
         self.__game_start = Button(self.__mt_window, text="Start Game",
                             command= self.game_start)
@@ -340,17 +363,27 @@ class Mode_Theme:
 
     def game_start(self):
         self.__mt_window.destroy()
-        if self.__clicked2.get() == THEME[0]:
-            theme ='images/pokemon/'
-        elif self.__clicked2.get() == THEME[1]:
-            theme ='images/lol/'
+        for i in THEME_DICT:
+            if self.__clicked2.get() == i:
+                theme = THEME_DICT[i]
+        
+        for j in MODE_DICT:
+            if self.__clicked1.get() == j:
+                row = int(MODE_DICT[j][0])
+                col = int(MODE_DICT[j][-1])
+                GamePlay(row, col,theme)
 
-        if self.__clicked1.get() == MODE[0]:
-            GamePlay(4, 3,theme)
-        elif self.__clicked1.get() == MODE[1]:
-            GamePlay(4, 6,theme)
-        elif self.__clicked1.get() == MODE[2]:
-            GamePlay(5, 8, theme)
+        # if self.__clicked2.get() == THEME[0]:
+        #     theme ='images/pokemon/'
+        # elif self.__clicked2.get() == THEME[1]:
+        #     theme ='images/lol/'
+
+        # if self.__clicked1.get() == MODE[0]:
+        #     GamePlay(3, 4,theme)
+        # elif self.__clicked1.get() == MODE[1]:
+        #     GamePlay(4, 6,theme)
+        # elif self.__clicked1.get() == MODE[2]:
+        #     GamePlay(5, 8, theme)
 
 
 def to_main(window):
