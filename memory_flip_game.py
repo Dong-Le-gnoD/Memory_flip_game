@@ -281,7 +281,7 @@ class GamePlay:
         update timer
         """
         if not self.game_clear():
-            # if the game is not finished, then timer still run and update every 1 second
+            # if the game is not finished, then timer still run and update every 1sec
             time_passed = int(time.time() - self.__start_time)
             self.__time_display.config(text="Time: " + str(time_passed) + " sec")
             self.__game_window.after(1000, self.update_time)
@@ -369,47 +369,76 @@ class GamePlay:
         # move counter is increased and display on the screen
         self.__move_counter +=1
         self.__move_display.config(text="Moved: " + str(self.__move_counter))
-        
-        buttons[row][col].config(image=cards[row][col], bg="gray99")
+
+        # reveal/change the button image with the actual card image
+        buttons[row][col].config(image=cards[row][col])
+
+        # if move counter is even, it means this is the second reveal
         if self.__move_counter % 2 == 0:
+            # get the data from save_pic list
             x = self.__save_pic[0]
             y = self.__save_pic[1]
 
+            # compare the first one to the second one
             if cards[row][col] == cards[x][y]:
+                # if match, increase the finish_matched
                 self.__finish_matched += 1
-                buttons[row][col].config(state=DISABLED, bg="white")
-                buttons[x][y].config(state=DISABLED, bg="white")
+                # disable two buttons
+                buttons[row][col].config(state=DISABLED)
+                buttons[x][y].config(state=DISABLED)
             else:
+                # if mismatch, then hide the buttons again after 0.5sec
                 buttons[row][col].after(500, self.hide_buttons, buttons, row, col, x, y)
             self.__save_pic.clear()
         else:
+            # the move counter is odd, this is the first reveal
+            # save the parameter of the first image to the save_pic list
             self.__save_pic.append(row)
             self.__save_pic.append(col)
 
 
     def hide_buttons(self, buttons, row, col, x, y):
-        buttons[row][col].config(image=self.__background_image, bg="white")
-        buttons[x][y].config(image=self.__background_image, bg="white")
+        """
+        Hide the card image after mismatch, set them to background image
+
+        :param buttons: list, a list of buttons
+        :param row: int, index of row for second card
+        :param col: int, index of collumn for second card
+        :param x: int, index of row for first card
+        :param y: int, index of collumn for first card
+        """
+        buttons[row][col].config(image=self.__background_image)
+        buttons[x][y].config(image=self.__background_image)
 
 
     def game_clear(self):
+        # check if the finish match is equal to cards needed
         return self.__finish_matched == self.__cards_needed
 
     def pop_up_ques(self):
+        # after game is finished, check if user want to play more
         ask = messagebox.askyesno(title="Success!", 
                     message="Congratulation, you won!\n\nDo you want to play again?")
         if ask == 1:
+            # if yes, go back to theme and mode selection
             to_mode_theme(self.__game_window)
         else:
+            # if no, go back to main window
             to_main(self.__game_window)
 
     def restart(self):
+        # from menu bar, if user choose restart, then delete everything
+        # run the GamePlay class again with the same parameter as the old one
+        # in this case, cards are different, timer is reset, move counter is reset
         self.__game_window.destroy()
         GamePlay(self.__row, self.__col, self.__theme)
 
 
 
 class Main_Screen:
+    """
+    The main screen class handle the first screen of the game
+    """
     def __init__(self):
         self.__main_window = Tk()
         self.__main_window.geometry("+100+20")
@@ -439,27 +468,11 @@ class Main_Screen:
         self.__quit_button.grid(row=4, column=0, columnspan=3)
         self.__main_window.mainloop()
         
-    # def rule(self):
-    #     self.__intro.destroy()
-    #     self.__newgame.destroy()
-    #     self.__rule.destroy()
-    #     self.__gallery.destroy()
-    #     self.__quit_button.destroy()
-    #     button_quit = Button(text= "Back", 
-    #                 command=lambda: to_main(self.__main_window))
-    #     rule1 = Label(text= "Click on the cards to see what symbol they uncover\n and try to find the matching symbol underneath the other cards")
-    #     rule2 = Label(text= "Uncover two matching symbols at once\n to eliminate them from the game.") 
-    #     rule3 = Label(text= "Eliminate all cards\n as fast as you can to win the game.")
-
-
-    #     rule1.grid(row=0,column=0)
-    #     rule2.grid(row=1,column=0)
-    #     rule3.grid(row=2,column=0)
-    #     button_quit.grid(row=3,column=0)
-
-
 
 class Mode_Theme:
+    """
+    The class handle the user selection of mode and theme
+    """
     def __init__(self):
         self.__mt_window = Tk()
         self.__mt_window.geometry("+100+20")
@@ -508,6 +521,7 @@ class Mode_Theme:
                 GamePlay(row, col,theme)
 
 def pop_up_rule():
+    # function display rules of the game in a message box
     text = "Click on the cards to see what symbol they uncover and try to find the matching symbol underneath the other cards.\n\n"
     text1 = "Uncover two matching symbols at once to eliminate them.\n\n" 
     text2 = "If two cards are mismatch, they flip over to hide their symbols.\n\n" 
@@ -516,14 +530,17 @@ def pop_up_rule():
     messagebox.showinfo("Rules",text+text1+text2+text3)
 
 def to_main(window):
+    # Delete everything in the current window, and start at the Main_Screen class
     window.destroy()
     Main_Screen()
 
 def to_mode_theme(window):
+    # Delete everything in the current window, and start at the Mode_Theme class
     window.destroy()
     Mode_Theme()
 
 def to_gallery(window):
+    # Delete everything in the current window, and start at the Gallery class
     window.destroy()
     Gallery()       
 
