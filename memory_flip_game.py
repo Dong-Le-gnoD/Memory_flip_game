@@ -440,13 +440,17 @@ class Main_Screen:
     The main screen class handle the first screen of the game
     """
     def __init__(self):
+        # Creating the window and the components
         self.__main_window = Tk()
         self.__main_window.geometry("+100+20")
         self.__main_window.resizable(0, 0)
         self.__main_window.title("Memory Game")
 
+        # Welcome label to the game
         self.__intro = Label(self.__main_window, text="Welcome to Memory Game",
                         bg="#A2A2CD",fg="#E6E6E6", font=('Arial',21))
+        
+        # Four buttons for new game, checking rules, checking gallery, and exit
         self.__newgame = Button(self.__main_window, text="New Game",
                         bg="#A2A2CD",fg="#E6E6E6",
                         command= lambda: to_mode_theme(self.__main_window))
@@ -474,27 +478,35 @@ class Mode_Theme:
     The class handle the user selection of mode and theme
     """
     def __init__(self):
+        # Creating the window and the components
         self.__mt_window = Tk()
         self.__mt_window.geometry("+100+20")
         self.__mt_window.resizable(0, 0)
         self.__mt_window.title("New Game")
 
+        # Intro to user
         self.__intro = Label(self.__mt_window, text="Choose mode and theme")
+        # back button to return to main window
         self.__button_quit = Button(text= "Back",
                             command= lambda: to_main(self.__mt_window))
 
-        
+        # setup two option menu for mode and theme
         self.__clicked1 = StringVar()
+        # set the default option of mode is the first key of dictionary MODE_DICT
+        # which is easy mode
         self.__clicked1.set(next(iter(MODE_DICT)))
         intro1 = Label(self.__mt_window, text="Mode")
         choice1 = OptionMenu(self.__mt_window, self.__clicked1, *MODE_DICT)
 
         
         self.__clicked2 = StringVar()
+        # set the default option of theme is the first key of dictionary THEME_DICT
+        # which is pokemon theme
         self.__clicked2.set(next(iter(THEME_DICT)))
         intro2 = Label(self.__mt_window, text="Theme")
         choice2 = OptionMenu(self.__mt_window, self.__clicked2, *THEME_DICT)
 
+        # button to start the game
         self.__game_start = Button(self.__mt_window, text="Start Game",
                             command= self.game_start)
 
@@ -509,15 +521,24 @@ class Mode_Theme:
 
 
     def game_start(self):
+        # delete the window to start a new window in GamePlay class
         self.__mt_window.destroy()
+        # loop through the THEME_DICT
         for i in THEME_DICT:
+            # if user choose any theme that the same as key of the theme
+            # dictionary, then the theme is the value of that key
             if self.__clicked2.get() == i:
                 theme = THEME_DICT[i]
         
+        # loop through the MODE_DICT
         for j in MODE_DICT:
+            # if user choose any mode that the same as key of the mode
+            # dictionary, then the parameter row and collumn are the
+            # first value and last value in integer
             if self.__clicked1.get() == j:
                 row = int(MODE_DICT[j][0])
                 col = int(MODE_DICT[j][-1])
+                # pass the data to GamePlay class
                 GamePlay(row, col,theme)
 
 def pop_up_rule():
